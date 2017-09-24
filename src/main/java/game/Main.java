@@ -35,6 +35,17 @@ public class Main {
                 {false, true,  true,  true,  false, true,  true,  true,  false},
                 {false, true,  true,  false, false, true,  true,  false, true}
         };
+        boolean[][] pureMap = new boolean[][] {
+                {true , true , true , true , false, false, false, false, false},
+                {true , true , true , true , false, false, false, false, false},
+                {true , true , true , true , false, false, false, false, false},
+                {true , true , true , false, false, false, false, false, false},
+                {true , true , true , true , false, false, false, false, false},
+                {false, false, false, false, false, false, false, false, false},
+                {false, false, false, false, false, false, false, false, false},
+                {false, false, false, false, false, false, false, false, false},
+                {false, false, false, false, false, false, false, false, false}
+        };
         Pos[] moveOffset = new Pos[] {
                 new Pos(-1,  0),    // 向左移动
                 new Pos(-1, -1),    // 向左上移动
@@ -49,7 +60,7 @@ public class Main {
 
         // 执行算法
         long begin = System.currentTimeMillis();
-        List<Pos> longestPath = getLongestPathBySA(simpleMap, start, moveOffset);
+        List<Pos> longestPath = getLongestPathBySA(pureMap, start, moveOffset);
         System.out.println(System.currentTimeMillis() - begin + "ms");
 
         // 打印路径
