@@ -46,13 +46,10 @@ public class Main {
         };
         Pos start = new Pos(3, 3);
 
-        // 执行深度优先算法
-        long begin = System.currentTimeMillis();
+        // 执行算法
         List<Pos> longestPath = getLongestPathBySA(complexMap, start, moveOffset);
-        long end = System.currentTimeMillis();
 
         // 打印路径
-        System.out.println(end - begin + "ms");
         System.out.println(longestPath);
         printPathInMap(simpleMap, longestPath);
 
@@ -372,7 +369,6 @@ public class Main {
         return newPath;
 
     }
-
 
     /**
      * 判断当前节点是否在地图内
