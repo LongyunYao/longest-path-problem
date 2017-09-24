@@ -2,7 +2,6 @@ package game;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
 /**
  * 主函数
@@ -60,7 +59,7 @@ public class Main {
 
         // 执行算法
         long begin = System.currentTimeMillis();
-        List<Pos> longestPath = getLongestPathBySA(pureMap, start, moveOffset);
+        List<Pos> longestPath = getLongestPathBySA(complexMap, start, moveOffset);
         System.out.println(System.currentTimeMillis() - begin + "ms");
 
         // 打印路径
@@ -73,7 +72,7 @@ public class Main {
      * 通过深度优先搜索算法获取最长路径
      * @param map 地图
      * @param start 起点
-     * @param moveOffset 方向偏移量
+     * @param moveOffset 移动偏移量
      * @return 最长路径
      */
     public static List<Pos> getLongestPathByDFS(boolean[][] map, Pos start, Pos[] moveOffset) {
@@ -86,21 +85,16 @@ public class Main {
 
     /**
      * 递归实现深度优先搜索
-     * @param pos 当前节点
-     * @param map 地图
-     * @param path 当前路径
-     * @param result 最终结果
-     * @param moveOffset 方向偏移量
      */
     private static void dfs(Pos pos, boolean[][] map, List<Pos> path, List<Pos> result, Pos[] moveOffset) {
 
-        // 记录当前节点的周围是否经过
+        // 记录当前位置向周围格子移动的记录
         List<Pos> visited = new ArrayList<>();
 
-        // 保存当前节点的周围节点
+        // 保存当前位置的周围格子
         Pos[] neighbours = new Pos[moveOffset.length];
 
-        // 依次向周围行走
+        // 依次向周围移动
         for (int i = 0; i < moveOffset.length; i++) {
             Pos next = new Pos(pos.getX() + moveOffset[i].getX(), pos.getY() + moveOffset[i].getY());
             neighbours[i] = next;
@@ -111,7 +105,7 @@ public class Main {
             }
         }
 
-        // 当前无路可走时保存最长路径
+        // 若在当前位置下，没有向周围的格子移动过时，保存最长路径
         if (visited.isEmpty()) {
             if (path.size() > result.size()) {
                 result.clear();
@@ -119,7 +113,7 @@ public class Main {
             }
         }
 
-        // 当周围节点都不能行走时回退到上一步
+        // 周围的格子都不可以移动时回退到上一格子
         for (Pos neighbour : neighbours) {
             if (canPath(map, path, neighbour, visited)) {
                 return;
@@ -130,21 +124,21 @@ public class Main {
     }
 
     /**
-     * 判断当前节点是否可以行走
+     * 判断格子是否可以移动
      */
     private static boolean canPath(boolean[][] map, List<Pos> path, Pos pos, List<Pos> visited) {
 
-        // 不在地图里，不能行走
+        // 不在地图里，不能移动
         if (!inMap(map, pos)) {
             return false;
         }
 
-        // 空白格子，不能行走
+        // 空白格子，不能移动
         if (!map[pos.getY()][pos.getX()]) {
             return false;
         }
 
-        // 已经在路径中或经过，不能行走
+        // 已经在路径中或经过，不能移动
         if (path.contains(pos) || visited.contains(pos)) {
             return false;
         }
@@ -153,10 +147,28 @@ public class Main {
     }
 
     /**
+     * 判断格子是否在地图内
+     */
+    private static boolean inMap(boolean[][] map, Pos pos) {
+
+        if (pos.getY() < 0 || pos.getY() >= map.length) {
+            return false;
+        }
+
+        if (pos.getX() < 0 || pos.getX() >= map[0].length) {
+            return false;
+        }
+
+        return true;
+
+    }
+
+
+    /**
      * 通过贪心算法获取最长路径
      * @param map 地图
      * @param start 起点
-     * @param moveOffset 方向偏移量
+     * @param moveOffset 移动偏移量
      * @return 最长路径
      */
     public static List<Pos> getLongestPathByChain(boolean[][] map, Pos start, Pos[] moveOffset) {
@@ -170,15 +182,10 @@ public class Main {
 
     /**
      * 递归实现贪心算法
-     * @param pos 当前节点
-     * @param map 地图
-     * @param path 当前路径
-     * @param result 最终结果
-     * @param moveOffset 方向偏移量
      */
     private static void chain(Pos pos, boolean[][] map, List<Pos> path, List<Pos> result, Pos[] moveOffset) {
 
-        // 获取出路最小的节点
+        // 获取出路最小的格子
         Pos minWayPos = getMinWayPos(pos, map, moveOffset);
 
         if (minWayPos != null) {
@@ -197,7 +204,7 @@ public class Main {
     }
 
     /**
-     * 获取当前节点周围最小出路的节点
+     * 获取当前格子周围出路最小的格子
      */
     private static Pos getMinWayPos(Pos pos, boolean[][] map, Pos[] moveOffset) {
 
@@ -225,7 +232,7 @@ public class Main {
         }
 
         if (minWayPoss.size() != 0) {
-            // 随机返回一个最小出路的节点
+            // 随机返回一个出路最小的格子
             return minWayPoss.get((int) (Math.random() * minWayPoss.size()));
         } else {
             return null;
@@ -233,18 +240,16 @@ public class Main {
 
     }
 
-
-
     /**
      * 通过模拟退火算法获取最长路径
      * @param map 地图
      * @param start 起点
-     * @param moveOffset 方向偏移量
+     * @param moveOffset 移动偏移量
      * @return 最长路径
      */
     public static List<Pos> getLongestPathBySA(boolean[][] map, Pos start, Pos[] moveOffset) {
 
-        // 初始化参数
+        // 初始化退火参数
         double temperature = 100.0;
         double endTemperature = 1e-8;
         double descentRate = 0.98;
@@ -274,7 +279,7 @@ public class Main {
                 List<Pos> newPath = getNewPath(cloneMap, path, moveOffset, count / total);
                 int newResult = caculateResult(newPath);
 
-                // 判断是否替换解
+                // 根据函数结果判断是否替换解
                 if (newResult - result < 0) {
                     // 替换
                     path.clear();
@@ -295,7 +300,7 @@ public class Main {
 
         }
 
-        // 返回一条最长的路径
+        // 返回一条最长路径
         for (int i = 0; i < paths.size(); i++) {
             if (paths.get(i).size() > longestPath.size()) {
                 longestPath = paths.get(i);
@@ -320,15 +325,13 @@ public class Main {
      * 初始化路径
      */
     private static List<Pos> initPath(boolean[][] map, Pos start, Pos[] moveOffset) {
-
         List<Pos> path = new ArrayList<>();
         getPath(map, start, path, moveOffset);
         return path;
-
     }
 
     /**
-     * 根据当前路径继续行走到底，采用随机行走策略
+     * 根据当前路径继续移动到底，采用随机移动策略
      */
     private static void getPath(boolean[][] map, Pos current, List<Pos> path, Pos[] moveOffset) {
 
@@ -361,7 +364,7 @@ public class Main {
 
 
     /**
-     * 根据当前路径和降温率，生成一条新路径
+     * 根据当前路径和降温进度，生成一条新路径
      */
     private static List<Pos> getNewPath(boolean[][] map, List<Pos> path, Pos[] moveOffset, double ratio) {
 
@@ -382,23 +385,6 @@ public class Main {
 
         getPath(map, newPath.get(newPath.size() - 1), newPath, moveOffset);
         return newPath;
-
-    }
-
-    /**
-     * 判断当前节点是否在地图内
-     */
-    private static boolean inMap(boolean[][] map, Pos pos) {
-
-        if (pos.getY() < 0 || pos.getY() >= map.length) {
-            return false;
-        }
-
-        if (pos.getX() < 0 || pos.getX() >= map[0].length) {
-            return false;
-        }
-
-        return true;
 
     }
 
