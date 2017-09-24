@@ -2,6 +2,7 @@ package game;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 /**
  * 主函数
@@ -47,7 +48,9 @@ public class Main {
         Pos start = new Pos(3, 3);
 
         // 执行算法
-        List<Pos> longestPath = getLongestPathBySA(complexMap, start, moveOffset);
+        long begin = System.currentTimeMillis();
+        List<Pos> longestPath = getLongestPathBySA(simpleMap, start, moveOffset);
+        System.out.println(System.currentTimeMillis() - begin + "ms");
 
         // 打印路径
         System.out.println(longestPath);
@@ -220,6 +223,7 @@ public class Main {
     }
 
 
+
     /**
      * 通过模拟退火算法获取最长路径
      * @param map 地图
@@ -265,7 +269,7 @@ public class Main {
                     path.clear();
                     path.addAll(newPath);
                 } else {
-                    // 以概率替换
+                    // 以一定的概率替换
                     double p = 1 / (1 + Math.exp(-(newResult - result) / temperature));
                     if (Math.random() < p) {
                         path.clear();
