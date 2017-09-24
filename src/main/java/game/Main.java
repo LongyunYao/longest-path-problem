@@ -47,7 +47,7 @@ public class Main {
         Pos start = new Pos(3, 3);
 
         // 执行深度优先算法
-        List<Pos> longestPath = getLongestPathByDFS(complexMap, start, moveOffset);
+        List<Pos> longestPath = getLongestPathByChain(complexMap, start, moveOffset);
 
         // 打印路径
         System.out.println(longestPath);
@@ -137,6 +137,91 @@ public class Main {
 
         return true;
     }
+
+    /**
+     * 通过贪心算法获取最长路径
+     * @param map 地图
+     * @param start 起点
+     * @param moveOffset 方向偏移量
+     * @return 最长路径
+     */
+    public static List<Pos> getLongestPathByChain(boolean[][] map, Pos start, Pos[] moveOffset) {
+
+        List<Pos> longestPath = new ArrayList<>();
+        chain(start, map, new ArrayList<>(), longestPath, moveOffset);
+        return longestPath;
+
+    }
+
+
+    /**
+     * 递归实现贪心算法
+     * @param pos 当前节点
+     * @param map 地图
+     * @param path 当前路径
+     * @param result 最终结果
+     * @param moveOffset 方向偏移量
+     */
+    private static void chain(Pos pos, boolean[][] map, List<Pos> path, List<Pos> result, Pos[] moveOffset) {
+
+        // 获取出路最小的节点
+        Pos minWayPos = getMinWayPos(pos, map, moveOffset);
+
+        if (minWayPos != null) {
+            // 递归搜寻路径
+            path.add(minWayPos);
+            map[minWayPos.getY()][minWayPos.getX()] = false;
+            chain(minWayPos, map, path, result, moveOffset);
+        } else {
+            // 当前无路可走时保存最长路径
+            if (path.size() > result.size()) {
+                result.clear();
+                result.addAll(path);
+            }
+        }
+
+    }
+
+    /**
+     * 获取当前节点周围最小出路的节点
+     */
+    private static Pos getMinWayPos(Pos pos, boolean[][] map, Pos[] moveOffset) {
+
+        int minWayCost = Integer.MAX_VALUE;
+        List<Pos> minWayPoss = new ArrayList<>();
+
+        for (int i = 0; i < moveOffset.length; i++) {
+            Pos next = new Pos(pos.getX() + moveOffset[i].getX(), pos.getY() + moveOffset[i].getY());
+            if (inMap(map, next) && map[next.getY()][next.getX()]) {
+                int w = -1;
+                for (int j = 0; j < moveOffset.length; j++) {
+                    Pos nextNext = new Pos(next.getX() + moveOffset[j].getX(), next.getY() + moveOffset[j].getY());
+                    if (inMap(map, nextNext) && map[nextNext.getY()][nextNext.getX()]) {
+                        w++;
+                    }
+                }
+                if (minWayCost > w) {
+                    minWayCost = w;
+                    minWayPoss.clear();
+                    minWayPoss.add(next);
+                } else if (minWayCost == w) {
+                    minWayPoss.add(next);
+                }
+            }
+        }
+
+        if (minWayPoss.size() != 0) {
+            // 随机返回一个最小出路的节点
+            return minWayPoss.get((int) (Math.random() * minWayPoss.size()));
+        } else {
+            return null;
+        }
+
+    }
+
+
+
+
 
     /**
      * 判断当前节点是否在地图内
